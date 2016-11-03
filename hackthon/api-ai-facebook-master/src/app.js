@@ -21,19 +21,25 @@ function processEvent(event) {
     var sender = event.sender.id.toString();
 
     if ((event.message && event.message.text) || (event.postback && event.postback.payload)) {
-        var text = event.message ? event.message.text : event.postback.payload;
-        // Handle a text message from this sender
+            var text = event.message ? event.message.text : event.postback.payload;
+            // Handle a text message from this sender
 
-        if (!sessionIds.has(sender)) {
-            sessionIds.set(sender, uuid.v1());
+            if (!sessionIds.has(sender)) {
+                sessionIds.set(sender, uuid.v1());
+            }
+
+            console.log("Text", text);
+
+            let apiaiRequest = apiAiService.textRequest(text,
+                {
+                    sessionId: sessionIds.get(sender),
+                    contexts:[
+                        name: "generic",
+            parameters:{
+            facebook_user: sender
         }
-
-        console.log("Text", text);
-
-        let apiaiRequest = apiAiService.textRequest(text,
-            {
-                sessionId: sessionIds.get(sender)
-            });
+    ]
+                });
 
         apiaiRequest.on('response', (response) => {
             if (isDefined(response.result)) {
